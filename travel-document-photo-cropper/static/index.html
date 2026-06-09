@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>旅行证 Photo Cropper</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>旅行证 Photo Cropper</h1>
+      <p class="subtitle">Chinese consulate travel document photo — 33×48 mm</p>
+    </header>
+
+    <section id="upload-section">
+      <label class="upload-btn">
+        Upload Photo
+        <input type="file" id="file-input" accept="image/*" hidden>
+      </label>
+      <p class="hint">White background, dark shirt, face the camera. Leave space above the head.</p>
+    </section>
+
+    <p id="error-msg" class="error hidden"></p>
+
+    <section id="editor-section" class="hidden">
+      <div class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+      </div>
+
+      <div class="controls">
+        <label>
+          Zoom
+          <input type="range" id="zoom-slider" min="50" max="200" value="100">
+        </label>
+      </div>
+
+      <div id="metrics" class="metrics"></div>
+
+      <div class="actions">
+        <button id="export-btn">Download JPG (390×567)</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
