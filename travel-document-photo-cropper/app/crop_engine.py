@@ -25,12 +25,14 @@ from app.specs import (
 )
 
 MODEL_PATH = Path(__file__).parent.parent / "models" / "face_landmarker.task"
+SEGMENTER_MODEL_PATH = Path(__file__).parent.parent / "models" / "selfie_segmenter.tflite"
 
 CHIN = 152
 LEFT_EAR = 234
 RIGHT_EAR = 454
 
 _landmarker = None
+_segmenter = None
 
 
 def _get_landmarker():
@@ -43,6 +45,43 @@ def _get_landmarker():
         )
         _landmarker = vision.FaceLandmarker.create_from_options(options)
     return _landmarker
+
+
+def _get_segmenter():
+    global _segmenter
+    if _segmenter is None:
+        options = vision.ImageSegmenterOptions(
+            base_options=python.BaseOptions(model_asset_path=str(SEGMENTER_MODEL_PATH)),
+            running_mode=vision.RunningMode.IMAGE,
+            output_confidence_masks=True,
+        )
+        _segmenter = vision.ImageSegmenter.create_from_options(options)
+    return _segmenter
+
+
+def whiten_background(bgr: np.ndarray) -> np.ndarray:
+    """Replace the background with white using selfie segmentation."""
+    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+    result = _get_segmenter().segment(mp_image)
+
+    mask = result.confidence_masks[0].numpy_view().squeeze().astype(np.float32)
+    mask = cv2.GaussianBlur(mask, (0, 0), sigmaX=2)
+    mask = np.clip(mask, 0, 1)[..., np.newaxis]
+
+    white = np.full_like(rgb, 255, dtype=np.float32)
+    out = (rgb.astype(np.float32) * mask + white * (1 - mask)).astype(np.uint8)
+    return cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
+
+
+def prepare_image(image_bytes: bytes) -> bytes:
+    """Return a whitened JPEG for preview/export."""
+    bgr = whiten_background(_load_bgr(image_bytes))
+    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    pil = Image.fromarray(rgb)
+    buf = io.BytesIO()
+    pil.save(buf, format="JPEG", quality=92)
+    return buf.getvalue()
 
 
 def _load_bgr(image_bytes: bytes) -> np.ndarray:

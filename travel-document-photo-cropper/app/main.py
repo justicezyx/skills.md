@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app.crop_engine import detect_face, export_photo, suggest_crop, validate_crop
+from app.crop_engine import detect_face, export_photo, prepare_image, suggest_crop, validate_crop
 
 app = FastAPI(title="旅行证 Photo Cropper")
 
@@ -31,7 +31,7 @@ async def upload(file: UploadFile = File(...)):
     metrics = validate_crop(face, crop)
 
     image_id = str(uuid.uuid4())
-    uploads[image_id] = image_bytes
+    uploads[image_id] = prepare_image(image_bytes)
 
     return {
         "image_id": image_id,
