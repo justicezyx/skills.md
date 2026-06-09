@@ -1,0 +1,107 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f5f5f5;
+  color: #222;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+header { margin-bottom: 1.5rem; }
+
+h1 { font-size: 1.5rem; }
+
+.subtitle { color: #666; font-size: 0.9rem; }
+
+.upload-btn {
+  display: inline-block;
+  padding: 0.6rem 1.4rem;
+  background: #c41e3a;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.upload-btn:hover { background: #a01830; }
+
+.hint { margin-top: 0.5rem; color: #888; font-size: 0.85rem; }
+
+.error {
+  color: #c41e3a;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #fde8ec;
+  border-radius: 6px;
+}
+
+.hidden { display: none !important; }
+
+.canvas-wrap {
+  background: #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+#canvas {
+  display: block;
+  width: 100%;
+  cursor: grab;
+}
+
+#canvas:active { cursor: grabbing; }
+
+.controls {
+  margin-bottom: 1rem;
+}
+
+.controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.controls input[type="range"] { flex: 1; }
+
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.metric {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.metric.ok { border-color: #2a9d4a; background: #edf7f0; }
+.metric.fail { border-color: #c41e3a; background: #fde8ec; }
+
+.metric .label { color: #666; }
+.metric .value { font-weight: 600; }
+
+.actions { text-align: center; }
+
+#export-btn {
+  padding: 0.7rem 2rem;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#export-btn:hover { background: #333; }
