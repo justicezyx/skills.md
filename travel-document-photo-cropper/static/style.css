@@ -44,10 +44,59 @@ h1 { font-size: 1.5rem; }
 .hidden { display: none !important; }
 
 .canvas-wrap {
+  position: relative;
   background: #ddd;
   border-radius: 8px;
   overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.canvas-tooltip {
+  position: absolute;
+  max-width: 220px;
+  padding: 0.5rem 0.65rem;
+  background: rgba(20, 20, 20, 0.92);
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.guide-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
   margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.guide-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: help;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.swatch.crown,
+.swatch.chin {
+  background: rgba(0, 200, 100, 0.25);
+  border: 1px dashed rgba(0, 200, 100, 0.7);
+}
+
+.swatch.head {
+  background: transparent;
+  border: 1px dashed rgba(100, 150, 255, 0.8);
 }
 
 #canvas {
@@ -71,6 +120,12 @@ h1 { font-size: 1.5rem; }
 
 .controls input[type="range"] { flex: 1; }
 
+.control-hint {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: #888;
+}
+
 .metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -92,16 +147,48 @@ h1 { font-size: 1.5rem; }
 .metric .label { color: #666; }
 .metric .value { font-weight: 600; }
 
-.actions { text-align: center; }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
 
+#whiten-btn,
+#revert-btn,
 #export-btn {
-  padding: 0.7rem 2rem;
-  background: #1a1a1a;
-  color: #fff;
+  padding: 0.7rem 1.5rem;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
   cursor: pointer;
+}
+
+#whiten-btn {
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #ccc;
+}
+
+#whiten-btn:hover:not(:disabled) { background: #f0f0f0; }
+
+#whiten-btn:disabled,
+#revert-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+#revert-btn {
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #ccc;
+}
+
+#revert-btn:hover:not(:disabled) { background: #f0f0f0; }
+
+#export-btn {
+  background: #1a1a1a;
+  color: #fff;
 }
 
 #export-btn:hover { background: #333; }

@@ -26,19 +26,38 @@
     <section id="editor-section" class="hidden">
       <div class="canvas-wrap">
         <canvas id="canvas"></canvas>
+        <div id="canvas-tooltip" class="canvas-tooltip hidden" role="tooltip"></div>
+      </div>
+
+      <div class="guide-legend">
+        <span class="guide-item" data-guide="crown">
+          <span class="swatch crown"></span>
+          Crown margin (3–5 mm)
+        </span>
+        <span class="guide-item" data-guide="chin">
+          <span class="swatch chin"></span>
+          Chin margin (≥7 mm)
+        </span>
+        <span class="guide-item" data-guide="head">
+          <span class="swatch head"></span>
+          Head size guides
+        </span>
       </div>
 
       <div class="controls">
         <label>
-          Zoom
-          <input type="range" id="zoom-slider" min="50" max="200" value="100">
+          Crop size
+          <input type="range" id="zoom-slider" min="20" max="300" value="100">
         </label>
+        <p class="control-hint">Drag the box to move · drag corners or scroll to resize · guides scale with the box</p>
       </div>
 
       <div id="metrics" class="metrics"></div>
 
       <div class="actions">
-        <button id="export-btn">Download JPG (390×567)</button>
+        <button id="whiten-btn" type="button">Whiten Background</button>
+        <button id="revert-btn" type="button" class="hidden">Revert to Original</button>
+        <button id="export-btn" type="button">Download JPG (390×567)</button>
       </div>
     </section>
   </div>
