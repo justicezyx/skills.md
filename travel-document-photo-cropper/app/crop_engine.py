@@ -25,12 +25,14 @@ from app.specs import (
 )
 
 MODEL_PATH = Path(__file__).parent.parent / "models" / "face_landmarker.task"
+SEGMENTER_MODEL_PATH = Path(__file__).parent.parent / "models" / "selfie_segmenter.tflite"
 
 CHIN = 152
 LEFT_EAR = 234
 RIGHT_EAR = 454
 
 _landmarker = None
+_segmenter = None
 
 
 def _get_landmarker():
@@ -43,6 +45,18 @@ def _get_landmarker():
         )
         _landmarker = vision.FaceLandmarker.create_from_options(options)
     return _landmarker
+
+
+def _get_segmenter():
+    global _segmenter
+    if _segmenter is None:
+        options = vision.ImageSegmenterOptions(
+            base_options=python.BaseOptions(model_asset_path=str(SEGMENTER_MODEL_PATH)),
+            running_mode=vision.RunningMode.IMAGE,
+            output_confidence_masks=True,
+        )
+        _segmenter = vision.ImageSegmenter.create_from_options(options)
+    return _segmenter
 
 
 def _load_bgr(image_bytes: bytes) -> np.ndarray:
@@ -154,6 +168,27 @@ def validate_crop(face: dict, crop: dict) -> dict:
         and metrics["head_width_ok"]
     )
     return metrics
+
+
+def whiten_background(image_bytes: bytes) -> bytes:
+    """Replace background with pure white, keeping the person via selfie segmentation."""
+    bgr = _load_bgr(image_bytes)
+    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    h, w = rgb.shape[:2]
+
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+    result = _get_segmenter().segment(mp_image)
+    person_mask = result.confidence_masks[0].numpy_view().reshape(h, w).astype(np.float32)
+    person_mask = np.clip(person_mask, 0.0, 1.0)
+    person_mask = cv2.GaussianBlur(person_mask, (0, 0), sigmaX=2)
+
+    white = np.full_like(rgb, 255)
+    blended = (person_mask[..., None] * rgb + (1.0 - person_mask[..., None]) * white).astype(np.uint8)
+
+    pil = Image.fromarray(blended)
+    buf = io.BytesIO()
+    pil.save(buf, format="JPEG", quality=95)
+    return buf.getvalue()
 
 
 def export_photo(image_bytes: bytes, crop: dict) -> bytes:
