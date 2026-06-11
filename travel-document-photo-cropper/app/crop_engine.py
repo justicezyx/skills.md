@@ -195,6 +195,27 @@ def validate_crop(face: dict, crop: dict) -> dict:
     return metrics
 
 
+def whiten_background(image_bytes: bytes) -> bytes:
+    """Replace background with pure white, keeping the person via selfie segmentation."""
+    bgr = _load_bgr(image_bytes)
+    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    h, w = rgb.shape[:2]
+
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+    result = _get_segmenter().segment(mp_image)
+    person_mask = result.confidence_masks[0].numpy_view().reshape(h, w).astype(np.float32)
+    person_mask = np.clip(person_mask, 0.0, 1.0)
+    person_mask = cv2.GaussianBlur(person_mask, (0, 0), sigmaX=2)
+
+    white = np.full_like(rgb, 255)
+    blended = (person_mask[..., None] * rgb + (1.0 - person_mask[..., None]) * white).astype(np.uint8)
+
+    pil = Image.fromarray(blended)
+    buf = io.BytesIO()
+    pil.save(buf, format="JPEG", quality=95)
+    return buf.getvalue()
+
+
 def export_photo(image_bytes: bytes, crop: dict) -> bytes:
     """Crop, resize to spec, return JPEG bytes."""
     bgr = _load_bgr(image_bytes)
