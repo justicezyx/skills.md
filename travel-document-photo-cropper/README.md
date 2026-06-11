@@ -2,7 +2,7 @@
 
 Crop photos to Chinese consulate passport / travel document (旅行证) specifications.
 
-**Output:** 390×567 px JPG (33×48 mm at 300 DPI)
+**Output:** 390×567 px JPG (33×48 mm at 300 DPI) with a white background
 
 ## Requirements
 
@@ -44,7 +44,7 @@ Open http://localhost:8000
 
 ## Usage
 
-1. Upload your photo
+1. Upload your photo — the background is automatically whitened
 2. Drag the crop box to adjust position; use the zoom slider to resize
 3. Check that all four metrics show green
 4. Download JPG and upload to 中国领事 APP
