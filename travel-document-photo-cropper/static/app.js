@@ -81,9 +81,9 @@ window.addEventListener("mousemove", (e) => {
     const canvasScale = canvas.width / canvas.clientWidth;
     const dxScreen = (e.clientX - dragStart.x) * canvasScale;
     const dyScreen = (e.clientY - dragStart.y) * canvasScale;
-    const imgScale = canvas.width / state.imgW;
-    state.crop.x = cropStart.x + dxScreen / imgScale;
-    state.crop.y = cropStart.y + dyScreen / imgScale;
+    const s = displayScale();
+    state.crop.x = cropStart.x + dxScreen / s;
+    state.crop.y = cropStart.y + dyScreen / s;
     clampCrop();
     draw();
     return;
@@ -260,16 +260,30 @@ function formatGuideText({ title, body }) {
   return `${title}: ${body}`;
 }
 
+const VIEW_MARGIN = 20;
+
+function getViewBounds() {
+  const c = state.crop;
+  return {
+    minX: Math.min(0, c.x) - VIEW_MARGIN,
+    minY: Math.min(0, c.y) - VIEW_MARGIN,
+    maxX: Math.max(state.imgW, c.x + c.width) + VIEW_MARGIN,
+    maxY: Math.max(state.imgH, c.y + c.height) + VIEW_MARGIN,
+  };
+}
+
 function displayScale() {
   const maxW = 680;
-  return Math.min(1, maxW / state.imgW);
+  const view = getViewBounds();
+  return Math.min(1, maxW / (view.maxX - view.minX));
 }
 
 function getCropScreenRect() {
   const s = displayScale();
+  const view = getViewBounds();
   return {
-    x: state.crop.x * s,
-    y: state.crop.y * s,
+    x: (state.crop.x - view.minX) * s,
+    y: (state.crop.y - view.minY) * s,
     w: state.crop.width * s,
     h: state.crop.height * s,
   };
@@ -291,8 +305,9 @@ function getHandleRects() {
 
 function imgCoords(e) {
   const s = displayScale();
+  const view = getViewBounds();
   const { x, y } = canvasCoords(e);
-  return { x: x / s, y: y / s };
+  return { x: x / s + view.minX, y: y / s + view.minY };
 }
 
 function hitHandle(e) {
@@ -324,10 +339,11 @@ function minCropWidth() {
 
 function maxCropWidth() {
   const aspect = SPEC.photoW / SPEC.photoH;
-  let w = state.imgW;
+  const maxDim = Math.max(state.imgW, state.imgH) * 2;
+  let w = maxDim;
   let h = w / aspect;
-  if (h > state.imgH) {
-    h = state.imgH;
+  if (h > maxDim) {
+    h = maxDim;
     w = h * aspect;
   }
   return w;
@@ -367,17 +383,13 @@ function syncSliderFromCrop() {
 }
 
 function getOverlayZones() {
-  const s = displayScale();
-  const cx = state.crop.x * s;
-  const cy = state.crop.y * s;
-  const cw = state.crop.width * s;
-  const ch = state.crop.height * s;
-  const mmH = (mm) => (mm / SPEC.photoH) * ch;
+  const crop = getCropScreenRect();
+  const mmH = (mm) => (mm / SPEC.photoH) * crop.h;
 
   return {
-    crop: { x: cx, y: cy, w: cw, h: ch },
-    crown: { x: cx, y: cy, w: cw, h: mmH(SPEC.crown[1]) },
-    chin: { x: cx, y: cy + ch - mmH(SPEC.chinMin), w: cw, h: mmH(SPEC.chinMin) },
+    crop,
+    crown: { x: crop.x, y: crop.y, w: crop.w, h: mmH(SPEC.crown[1]) },
+    chin: { x: crop.x, y: crop.y + crop.h - mmH(SPEC.chinMin), w: crop.w, h: mmH(SPEC.chinMin) },
   };
 }
 
@@ -430,18 +442,8 @@ function hideCanvasTooltip() {
 function clampCrop() {
   const c = state.crop;
   const aspect = SPEC.photoW / SPEC.photoH;
+  c.width = Math.max(minCropWidth(), c.width);
   c.height = c.width / aspect;
-
-  if (c.width > state.imgW) {
-    c.width = state.imgW;
-    c.height = c.width / aspect;
-  }
-  if (c.height > state.imgH) {
-    c.height = state.imgH;
-    c.width = c.height * aspect;
-  }
-  c.x = Math.max(0, Math.min(c.x, state.imgW - c.width));
-  c.y = Math.max(0, Math.min(c.y, state.imgH - c.height));
 }
 
 function drawHandles(cx, cy, cw, ch) {
@@ -463,13 +465,22 @@ function drawHandles(cx, cy, cw, ch) {
 
 function draw() {
   const s = displayScale();
-  canvas.width = state.imgW * s;
-  canvas.height = state.imgH * s;
+  const view = getViewBounds();
+  const viewW = view.maxX - view.minX;
+  const viewH = view.maxY - view.minY;
 
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  canvas.width = viewW * s;
+  canvas.height = viewH * s;
 
-  const cx = state.crop.x * s;
-  const cy = state.crop.y * s;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const imgX = (0 - view.minX) * s;
+  const imgY = (0 - view.minY) * s;
+  ctx.drawImage(img, imgX, imgY, state.imgW * s, state.imgH * s);
+
+  const cx = (state.crop.x - view.minX) * s;
+  const cy = (state.crop.y - view.minY) * s;
   const cw = state.crop.width * s;
   const ch = state.crop.height * s;
 

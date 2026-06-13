@@ -217,11 +217,31 @@ def whiten_background(image_bytes: bytes) -> bytes:
 
 
 def export_photo(image_bytes: bytes, crop: dict) -> bytes:
-    """Crop, resize to spec, return JPEG bytes."""
+    """Crop, resize to spec, return JPEG bytes.
+
+    When the crop extends beyond the source image, the missing area is filled
+    with white so the photo can be enlarged or repositioned outside the frame.
+    """
     bgr = _load_bgr(image_bytes)
-    x, y, w, h = int(crop["x"]), int(crop["y"]), int(crop["width"]), int(crop["height"])
-    cropped = bgr[y : y + h, x : x + w]
-    rgb = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
+    img_h, img_w = bgr.shape[:2]
+    x = int(round(crop["x"]))
+    y = int(round(crop["y"]))
+    w = int(round(crop["width"]))
+    h = int(round(crop["height"]))
+
+    out = np.full((h, w, 3), 255, dtype=np.uint8)
+    src_x1 = max(0, x)
+    src_y1 = max(0, y)
+    src_x2 = min(img_w, x + w)
+    src_y2 = min(img_h, y + h)
+    if src_x2 > src_x1 and src_y2 > src_y1:
+        dst_x1 = src_x1 - x
+        dst_y1 = src_y1 - y
+        out[dst_y1 : dst_y1 + (src_y2 - src_y1), dst_x1 : dst_x1 + (src_x2 - src_x1)] = bgr[
+            src_y1:src_y2, src_x1:src_x2
+        ]
+
+    rgb = cv2.cvtColor(out, cv2.COLOR_BGR2RGB)
     pil = Image.fromarray(rgb)
     pil = pil.resize((OUTPUT_WIDTH_PX, OUTPUT_HEIGHT_PX), Image.LANCZOS)
 
