@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Monolog Timer</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Interview Monolog Timer</h1>
+      <p class="subtitle">Track your speaking time so you don't rob the conversation</p>
+    </header>
+
+    <section class="clocks">
+      <div id="monolog-ring" class="monolog-ring level-safe">
+        <p class="clock-label">Current monolog</p>
+        <p id="clock-monolog" class="clock-monolog">0:00</p>
+      </div>
+      <div class="elapsed-wrap">
+        <p class="clock-label">Interview elapsed</p>
+        <p id="clock-elapsed" class="clock-elapsed">0:00</p>
+      </div>
+    </section>
+
+    <p id="hint-text" class="hint">Pause ~1s to reset monolog</p>
+
+    <p id="error-msg" class="error hidden"></p>
+
+    <section class="controls">
+      <button id="btn-start-interview" type="button">Start Interview</button>
+      <button id="btn-stop" type="button" disabled>Stop</button>
+      <button id="btn-new-interview" type="button" class="hidden">New Interview</button>
+    </section>
+
+    <section id="summary-panel" class="summary hidden">
+      <h2>Session summary</h2>
+      <p><span class="summary-label">Total time:</span> <span id="summary-elapsed">0:00</span></p>
+      <p><span class="summary-label">Longest monolog:</span> <span id="summary-peak">0:00</span></p>
+    </section>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
