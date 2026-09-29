@@ -1,0 +1,25 @@
+---
+description: Local Workspace layout — Origin repos vs tmp scratch; Cloud twin
+alwaysApply: true
+---
+
+# Workspace layout (local Mac)
+
+Root: `/Users/zyx/Workspace` — single folder for everything Cursor needs locally.
+
+## Layout
+
+- **Origin clones** — persistent artifacts only. Remotes are `origin.cursor.com` (not GitHub).
+- **`tmp/`** — local scratch: intermediate notes, dumps, drafts, throwaways.
+- A parallel **Cloud workspace** exists with a similar layout; do not assume local-only paths are the whole story.
+
+## Do
+
+- Put keepers (docs, code, decks, status worth keeping) in the relevant Origin repo.
+- Put intermediate notes and scratch in `tmp/` (or other non-repo scratch).
+- Prefer Origin remotes/workflows over GitHub.
+
+## Don't
+
+- Do not commit intermediate notes into Origin repos.
+- Do not treat Origin trees as dump space for drafts or session scratch.
