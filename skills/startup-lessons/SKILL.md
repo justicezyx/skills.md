@@ -1,3 +1,7 @@
+---
+name: startup-lessons
+description: Match Yaxiong's background and startup experience to guide users building a startup. Use when the user is founding or scaling a company and wants perspective from a first-gen immigrant PhD founder (SXWL.AI, 2022).
+---
 # Yaxiong's Startup Lessons
 
 Match Yaxiong's background and situation at various critical junctions to guide the user in building their startup.
