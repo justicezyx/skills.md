@@ -9,8 +9,6 @@ Personal Cursor **skills** and **commands** for Yaxiong (yxzhao).
 | `skills/<name>/SKILL.md` | `~/.cursor/skills/<name>/` |
 | `commands/*.md` | `~/.cursor/commands/` |
 
-Apps and experiments in this repo (photo cropper, interview timer, etc.) stay at the repo root; only agent customization lives under `skills/` and `commands/`.
-
 ## Install (local Mac)
 
 From a clone of this repository:
@@ -32,5 +30,3 @@ cp -a commands/. ~/.cursor/commands/
 1. Install skills into `~/.cursor/skills/` on your machine (above).
 2. In **Cursor → Settings → Agents → Context and Tools**, turn on **Sync Skills for Cloud Agents**.
 3. Confirm when prompted. Only `~/.cursor/skills/` syncs; commands in `~/.cursor/commands/` do not. To use a command on Cloud Agents, commit it under `.cursor/commands/` in a project repo or run `/migrate-to-skills` to convert commands into syncable skills.
-
-**Note:** This clone’s `origin` remote is GitHub (`justicezyx/skills.md`), not Origin (`origin.cursor.com`).
